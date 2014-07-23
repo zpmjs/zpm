@@ -1,0 +1,22 @@
+#!/usr/bin/env node
+
+var commander = require('commander');
+var zpm = require("../");
+
+commander.
+  version(require('../package.json').version).
+  usage('build').
+  option('-v, --version', 'output the version number').
+  option('build', 'build module.').
+  parse(process.argv);
+
+if (commander.build){
+  var cwd = process.cwd();
+  console.log(cwd);
+  zpm.build(cwd);
+} else {
+  commander.help();
+}
+
+
+// vim:ft=javascript

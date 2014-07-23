@@ -1,0 +1,24 @@
+{
+  "name": "zpm",
+  "version": "0.1.0",
+  "description": "The end of package manger.",
+  "main": "index.js",
+  "author": "闲耘 <hotoo.cn@gmail.com>",
+  "scripts": {
+    "test": "make test"
+  },
+  "dependencies": {
+    "gulp": "3.8.6",
+    "gulp-uglify": "0.3.1",
+    "gulp-jsbeautify": "0.1.1",
+    "gulp-concat": "2.3.3",
+    "gulp-replace": "0.4.0",
+    "gulp-zip": "0.4.0",
+    "del": "0.1.1",
+    "commander": "1.1.1"
+  },
+  "spm": {
+    "main": "gulpfile.js"
+  },
+  "license": "MIT"
+}
