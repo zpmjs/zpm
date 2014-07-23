@@ -1,7 +1,7 @@
 {
   "name": "zpm",
   "version": "0.1.0",
-  "description": "The end of package manger.",
+  "description": "The end of package manager.",
   "main": "index.js",
   "author": "闲耘 <hotoo.cn@gmail.com>",
   "scripts": {
