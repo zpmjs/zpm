@@ -10,10 +10,12 @@ commander.
   option('build', 'build module.').
   parse(process.argv);
 
+var cwd = process.cwd();
+
 if (commander.build){
-  var cwd = process.cwd();
-  console.log(cwd);
   zpm.build(cwd);
+} else if (commander.build){
+  zpm.zip(cwd);
 } else {
   commander.help();
 }

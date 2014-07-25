@@ -20,25 +20,28 @@ exports.build = function(cwd){
 
   var dist_dir = "dist";
 
-  del(dist_dir, function(){});
+  del(dist_dir, function(){
 
-  // build
-  gulp.src(["./template/intro.js", cwd + "/" + main_file, "./template/outro.js"])
-    .pipe(concat(main_file))
-    .pipe(replace('"{MODULE_ID}"', '"' + [name, version, main].join("/") + '"'))
-    .pipe(replace('"{MODULE_DEPS}"', '[]'))
-    //TODO: replace requires.
-    //.pipe(replace(/\brequire\s*\((["'])[^\1]*\1\)/, 'require("' + ''")'))
-    .pipe(uglify())
-    .pipe(gulp.dest([dist_dir, name, version].join("/")));
+    // build
+    gulp.src(["./template/intro.js", cwd + "/" + main_file, "./template/outro.js"])
+      .pipe(concat(main_file))
+      .pipe(replace('"{MODULE_ID}"', '"' + [name, version, main].join("/") + '"'))
+      .pipe(replace('"{MODULE_DEPS}"', '[]'))
+      //TODO: replace requires.
+      //.pipe(replace(/\brequire\s*\((["'])[^\1]*\1\)/, 'require("' + ''")'))
+      .pipe(uglify())
+      .pipe(gulp.dest([dist_dir, name, version].join("/")));
 
-  // build-debug
-  gulp.src(["./template/intro.js", cwd + "/" + main_file, "./template/outro.js"])
-    .pipe(concat(debug_file))
-    .pipe(replace('"{MODULE_ID}"', '"' + [name, version, main+"-debug"].join("/") + '"'))
-    .pipe(replace('"{MODULE_DEPS}"', '[]'))
-    .pipe(beautify({indentSize: 2}))
-    .pipe(gulp.dest([dist_dir, name, version].join("/")));
+    // build-debug
+    gulp.src(["./template/intro.js", cwd + "/" + main_file, "./template/outro.js"])
+      .pipe(concat(debug_file))
+      .pipe(replace('"{MODULE_ID}"', '"' + [name, version, main+"-debug"].join("/") + '"'))
+      .pipe(replace('"{MODULE_DEPS}"', '[]'))
+      .pipe(beautify({indentSize: 2}))
+      .pipe(gulp.dest([dist_dir, name, version].join("/")));
+
+  });
+
 };
 
 exports.zip = function(cwd){
@@ -47,14 +50,3 @@ exports.zip = function(cwd){
     .pipe(zip(main+".zip"))
     .pipe(gulp.dest(dist_dir));
 };
-
-
-gulp.task("watch", function(){
-  gulp.watch(main_file, ["build", "build-debug"]);
-});
-
-
-gulp.task("zip", function(){
-});
-
-gulp.task("default", ["watch", "build", "build-debug"]);
