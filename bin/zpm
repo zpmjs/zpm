@@ -3,18 +3,19 @@
 var commander = require('commander');
 var zpm = require("../");
 
-commander.
-  version(require('../package.json').version).
-  usage('build').
-  option('-v, --version', 'output the version number').
-  option('build', 'build module.').
-  parse(process.argv);
+commander
+  .version(require('../package.json').version)
+  .usage('<operation> [options]')
+  .option('-v, --version', 'output the version number')
+  .option('build', 'build module.')
+  .option('zip', 'build and zip module.')
+  .parse(process.argv);
 
 var cwd = process.cwd();
 
 if (commander.build){
   zpm.build(cwd);
-} else if (commander.build){
+} else if (commander.zip){
   zpm.zip(cwd);
 } else {
   commander.help();

@@ -48,8 +48,15 @@ exports.build = function(cwd){
 };
 
 exports.zip = function(cwd){
+  var pkg = require(cwd + "/package.json");
+
+  if (!pkg || !pkg.spm){return;}
+
+  var name = pkg.name;
   var dist_dir = "dist";
+  var main = pkg.spm.main.replace(/\.js$/, "");
+
   gulp.src(cwd + "/" + dist_dir + "/" + name + "/*")
     .pipe(zip(main+".zip"))
-    .pipe(gulp.dest(dist_dir));
+    .pipe(gulp.dest(cwd + "/" + dist_dir));
 };
