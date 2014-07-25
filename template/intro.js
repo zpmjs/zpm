@@ -3,7 +3,7 @@
 
   var zpm_define;
 
-  if (typeof global.define === "function" && (define.cmd || define.amd)){
+  if (typeof define === "function" && (define.cmd || define.amd)){
     zpm_define = define;
   } else {
 
