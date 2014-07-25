@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "The end of package manager.",
   "main": "index.js",
+  "bin": {
+    "zpm": "./bin/zpm"
+  },
   "author": "闲耘 <hotoo.cn@gmail.com>",
   "scripts": {
     "test": "make test"
@@ -19,6 +22,9 @@
   },
   "spm": {
     "main": "gulpfile.js"
+  },
+  "zpm": {
+    "seer.js": ["seer-sai.js", "seer-jsniffer.js"]
   },
   "license": "MIT"
 }
