@@ -21,9 +21,12 @@ exports.build = function(cwd){
   var dist_dir = "dist";
 
   del(dist_dir, function(){
+    var intro_file = __dirname + "/template/intro.js";
+    var outro_file = __dirname + "/template/outro.js";
+    var src_file = cwd + "/" + main_file;
 
     // build
-    gulp.src(["./template/intro.js", cwd + "/" + main_file, "./template/outro.js"])
+    gulp.src([intro_file, src_file, outro_file])
       .pipe(concat(main_file))
       .pipe(replace('"{MODULE_ID}"', '"' + [name, version, main].join("/") + '"'))
       .pipe(replace('"{MODULE_DEPS}"', '[]'))
@@ -33,7 +36,7 @@ exports.build = function(cwd){
       .pipe(gulp.dest([dist_dir, name, version].join("/")));
 
     // build-debug
-    gulp.src(["./template/intro.js", cwd + "/" + main_file, "./template/outro.js"])
+    gulp.src([intro_file, src_file, outro_file])
       .pipe(concat(debug_file))
       .pipe(replace('"{MODULE_ID}"', '"' + [name, version, main+"-debug"].join("/") + '"'))
       .pipe(replace('"{MODULE_DEPS}"', '[]'))
