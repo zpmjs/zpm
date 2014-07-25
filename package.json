@@ -28,7 +28,7 @@
     "commander": "1.1.1"
   },
   "spm": {
-    "main": "gulpfile.js"
+    "main": "index.js"
   },
   "zpm": {
     "seer.js": ["seer-sai.js", "seer-jsniffer.js"]
