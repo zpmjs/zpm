@@ -21,6 +21,8 @@
     };
 
     zpm_define = function(id, deps, factory){
+      if (global[ZPM_CACHE][id]) { return; }
+
       var return_exports = factory.call(global, module.require, module.exports, module);
 
       global[ZPM_CACHE][id] = return_exports || module.exports;
