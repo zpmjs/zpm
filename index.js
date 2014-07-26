@@ -40,7 +40,7 @@ exports.build = function(cwd){
       .pipe(concat(debug_file))
       .pipe(replace('"{MODULE_ID}"', '"' + [name, version, main+"-debug"].join("/") + '"'))
       .pipe(replace('"{MODULE_DEPS}"', '[]'))
-      .pipe(beautify({indentSize: 2}))
+      .pipe(beautify({indent_size: 2}))
       .pipe(gulp.dest([dist_dir, name, version].join("/")));
 
   });
