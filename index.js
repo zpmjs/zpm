@@ -1,4 +1,5 @@
 
+var path = require("path");
 var gulp = require("gulp");
 var concat = require("gulp-concat");
 var uglify = require("gulp-uglify");
@@ -25,13 +26,29 @@ exports.build = function(cwd){
     var outro_file = __dirname + "/template/outro.js";
     var src_file = cwd + "/" + main_file;
 
+    var deps = {};
+    if (pkg.zpm && pkg.zpm.dependencies){
+      deps = pkg.zpm.dependencies;
+    } else if (pkg.spm && pkg.spm.dependencies){
+      deps = pkg.spm.dependencies;
+    }
+
+    var dep_mods = {};
+    for(var mod in deps){
+      var dep_pkg = require(path.join(cwd, "sea-modules", mod, deps[mod], "package.json"));
+      dep_mods[mod] = path.join(mod, deps[mod],
+        (dep_pkg.spm ? dep_pkg.spm.main : dep_pkg.main).replace(/\.js$/, "")
+      );
+    }
+
     // build
     gulp.src([intro_file, src_file, outro_file])
       .pipe(concat(main_file))
       .pipe(replace('"{MODULE_ID}"', '"' + [name, version, main].join("/") + '"'))
       .pipe(replace('"{MODULE_DEPS}"', '[]'))
-      //TODO: replace requires.
-      //.pipe(replace(/\brequire\s*\((["'])[^\1]*\1\)/, 'require("' + ''")'))
+      .pipe(replace(/\brequire\s*\(\s*(["'])([^\1]*)\1\s*\)/, function($0, $1_quote, $2_name){
+        return deps[$2_name] ? 'require(' + $1_quote + dep_mods[$2_name] + $1_quote + ')'  : $0;
+      }))
       .pipe(uglify())
       .pipe(gulp.dest([dist_dir, name, version].join("/")));
 
@@ -40,6 +57,9 @@ exports.build = function(cwd){
       .pipe(concat(debug_file))
       .pipe(replace('"{MODULE_ID}"', '"' + [name, version, main+"-debug"].join("/") + '"'))
       .pipe(replace('"{MODULE_DEPS}"', '[]'))
+      .pipe(replace(/\brequire\s*\(\s*(["'])([^\1]*)\1\s*\)/, function($0, $1_quote, $2_name){
+        return deps[$2_name] ? 'require(' + $1_quote + dep_mods[$2_name] + $1_quote + ')'  : $0;
+      }))
       .pipe(beautify({indent_size: 2}))
       .pipe(gulp.dest([dist_dir, name, version].join("/")));
 
