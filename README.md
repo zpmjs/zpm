@@ -17,19 +17,21 @@ long long ago, you need write code like this:
     return window.Mod;
   }
 
-  var detector = window.detector || require("detector");
+  function factory(detector){
+    var Mod = {};
+    Mod.method = function(){
+      return detector.os.name + "/" + detector.os.version;
+    };
 
-  var Mod = {};
-  Mod.method = function(){
-    return detector.os.name + "/" + detector.os.version;
-  };
-
-  window.Mod = Mod;
+    return Mod;
+  }
 
   if ("function" === typeof define && (define.cmd || define.amd)){
     define(function(require, exports, module){
-      module.exports = Mod;
+      module.exports = factory(require("detector"));
     });
+  } else {
+    window.Mod = factory(window.detector);
   }
 })(this);
 ```
