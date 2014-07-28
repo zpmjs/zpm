@@ -9,7 +9,8 @@ You can write code on commonjs, and build it for anywhere.
 
 ## Diff
 
-long long ago, you need write code like this:
+long time ago, if you want code run in browser for anywhere, you need write
+code like this:
 
 ```js
 (function(window){
@@ -36,8 +37,13 @@ long long ago, you need write code like this:
 })(this);
 ```
 
-Now you need not to care about dependencies, AMD, CMD, CommonJS or UMD,
-Just write it by CommonJS:
+* In non-cmd, non-amd, you must use global variable.
+* You must manager dependencies by hand via global variable.
+
+----
+
+Now you just write code on CommonJS, zpm will build it to umd for anywhere in
+browser:
 
 ```js
 var detector = require("detector");
@@ -52,6 +58,9 @@ window.Mod = Mod;
 module.exports = Mod;
 ```
 
+And you may want use [spm](https://github.com/spmjs/spm) for write, debug,
+test and publish you source code.
+
 ## Install
 
 ```
@@ -62,4 +71,33 @@ $ npm install -g zpm
 
 ```
 $ zpm build
+```
+
+## Configure in package.json
+
+```json
+{
+  "zpm": {
+    "output": {
+      "umd-moudle-a.js": "commonjs-module-source-code-a.js",
+      "umd-moudle-b.js": ["commonjs-module-b.js", "commonjs-module-c.js"]
+    },
+    "dependencies": {
+      "jquery": "1.7.2"
+    }
+  }
+}
+```
+
+If no `zpm` infomation in package.json, zpm build use `spm` infomation.
+
+```json
+{
+  "spm": {
+    "main": "index.js",
+    "dependencies": {
+      "jquery": "1.7.2"
+    }
+  }
+}
 ```
