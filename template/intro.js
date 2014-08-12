@@ -4,14 +4,17 @@
   var g_define = global.define;
   var zpm_define;
   var zpmjs;
+  var use;
+
+  function each(list, handler) {
+    for(var i=0,l=list.length; i<l; i++){
+      handler.call(list, list[i], i);
+    }
+  }
 
   if (typeof g_define === "function" && (g_define.cmd || g_define.amd)){
     zpm_define = g_define;
-    zpmjs = global.seajs || {
-      use: function(modules, callback){
-        global.require(modules, callback);
-      }
-    };
+    use = global.seajs ? global.seajs.use : global.require;
   } else {
 
     var ZPM_CACHE = "_ZPM_CACHE_";
@@ -19,7 +22,7 @@
       global[ZPM_CACHE] = {};
     }
 
-    var module = {
+    var MODULE = {
       exports: {},
       require: function(id){
         return global[ZPM_CACHE][id];
@@ -29,28 +32,35 @@
     zpm_define = function(id, deps, factory){
       if (global[ZPM_CACHE][id]) { return; }
 
-      var return_exports = factory.call(global, module.require, module.exports, module);
+      var return_exports = factory.call(global, MODULE.require, MODULE.exports, MODULE);
 
-      global[ZPM_CACHE][id] = return_exports || module.exports;
+      global[ZPM_CACHE][id] = return_exports || MODULE.exports;
     };
     zpm_define.zmd = true;
 
-    zpmjs = {
-      use: function(modules, callback){
-        var args = [];
-
-        if (!(modules instanceof Array)){
-          modules = [modules];
-        }
-
-        for(var i=0,l=modules.length; i<l; i++){
-          args[i] = module.require(modules[i]);
-        }
-
-        callback.apply(global, args);
-      }
-    };
+    use = function(modules, callback){
+      callback();
+    }
   }
+
+  zpmjs.use = function(modules, callback){
+    var mods = [];
+
+    if (!(modules instanceof Array)){
+      modules = [modules];
+    }
+
+    use(modules, function(){
+      var args = arguments;
+
+      each(modules, function(module_id, i){
+        mods[i] = args[i] || MODULE.require(module_id);
+      });
+
+    });
+
+    callback.apply(global, mods);
+  };
 
   global.zpmjs = zpmjs;
 
