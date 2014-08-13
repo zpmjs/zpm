@@ -24,6 +24,7 @@ exports.build = function(cwd){
   del(dist_dir, function(){
     var intro_file = __dirname + "/template/intro.js";
     var outro_file = __dirname + "/template/outro.js";
+    var zpmjs_file = __dirname + "/node_modules/zpmjs/zpm.js"
     var src_file = cwd + "/" + main_file;
 
     var deps = {};
@@ -42,7 +43,7 @@ exports.build = function(cwd){
     }
 
     // build
-    gulp.src([intro_file, src_file, outro_file])
+    gulp.src([zpmjs_file, intro_file, src_file, outro_file])
       .pipe(concat(main_file))
       .pipe(replace('"{MODULE_ID}"', '"' + [name, version, main].join("/") + '"'))
       .pipe(replace('"{MODULE_DEPS}"', '[]'))
@@ -53,7 +54,7 @@ exports.build = function(cwd){
       .pipe(gulp.dest([dist_dir, name, version].join("/")));
 
     // build-debug
-    gulp.src([intro_file, src_file, outro_file])
+    gulp.src([zpmjs_file, intro_file, src_file, outro_file])
       .pipe(concat(debug_file))
       .pipe(replace('"{MODULE_ID}"', '"' + [name, version, main+"-debug"].join("/") + '"'))
       .pipe(replace('"{MODULE_DEPS}"', '[]'))

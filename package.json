@@ -18,6 +18,7 @@
     "test": "make test"
   },
   "dependencies": {
+    "zpmjs": "0.1.0",
     "gulp": "3.8.6",
     "gulp-uglify": "0.3.1",
     "gulp-jsbeautify": "0.1.1",
