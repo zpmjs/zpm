@@ -21,6 +21,7 @@
     "commander": "1.1.1",
     "del": "0.1.1",
     "event-stream": "^3.1.7",
+    "expect.js": "^0.3.1",
     "gulp": "3.8.6",
     "gulp-concat": "2.3.3",
     "gulp-jsbeautify": "0.1.1",
@@ -30,20 +31,17 @@
     "gulp-zip": "0.4.0",
     "zpmjs": "0.1.0"
   },
+  "devDependencies": {
+    "mocha": "1.17.1"
+  },
   "spm": {
-    "main": "test/index.js",
+    "main": "tests/main.js",
     "dependencies": {
       "detector": "2.0.1",
       "ready": "0.0.0",
       "evt": "0.1.0",
       "name-storage": "1.2.0"
     }
-  },
-  "zpm": {
-    "seer.js": [
-      "seer-sai.js",
-      "seer-jsniffer.js"
-    ]
   },
   "license": "MIT"
 }

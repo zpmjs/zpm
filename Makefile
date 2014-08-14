@@ -11,3 +11,6 @@ publish:
 
 build-test:
 	@./bin/zpm build
+
+test:
+	@node_modules/.bin/mocha -R spec tests/index.js
