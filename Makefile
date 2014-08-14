@@ -9,5 +9,11 @@ publish:
 	@git tag $(version)
 	@git push origin $(version)
 
-build-test:
+test-build:
 	@./bin/zpm build
+
+test-build-all:
+	@./bin/zpm build --all-in-one
+
+test:
+	@node_modules/.bin/mocha -R spec tests/index.js

@@ -3,6 +3,11 @@
 
 ----
 
+[![NPM version](https://badge.fury.io/js/zpm.png)](http://badge.fury.io/js/zpm)
+[![Build Status](https://secure.travis-ci.org/zpmjs/zpm.png?branch=master)](https://travis-ci.org/zpmjs/zpm)
+[![Coverage Status](https://coveralls.io/repos/zpmjs/zpm/badge.png?branch=master)](https://coveralls.io/r/zpmjs/zpm)
+
+
 The end of umd package manager for web.
 
 You can write code on commonjs, and build it for anywhere.

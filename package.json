@@ -1,6 +1,6 @@
 {
   "name": "zpm",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "The end of umd package manager for web.",
   "main": "index.js",
   "bin": {
@@ -18,23 +18,30 @@
     "test": "make test"
   },
   "dependencies": {
-    "gulp": "3.8.6",
-    "gulp-uglify": "0.3.1",
-    "gulp-jsbeautify": "0.1.1",
-    "gulp-concat": "2.3.3",
-    "gulp-replace": "0.4.0",
-    "gulp-zip": "0.4.0",
+    "commander": "1.1.1",
     "del": "0.1.1",
-    "commander": "1.1.1"
+    "event-stream": "^3.1.7",
+    "gulp": "3.8.6",
+    "gulp-concat": "2.3.3",
+    "gulp-jsbeautify": "0.1.1",
+    "gulp-replace": "0.4.0",
+    "gulp-uglify": "0.3.1",
+    "gulp-wrap": "^0.3.0",
+    "gulp-zip": "0.4.0",
+    "zpmjs": "0.1.0"
+  },
+  "devDependencies": {
+    "expect.js": "^0.3.1",
+    "mocha": "1.17.1"
   },
   "spm": {
-    "main": "test/index.js",
+    "main": "tests/main.js",
     "dependencies": {
-      "detector": "2.0.1"
+      "detector": "2.0.1",
+      "ready": "0.0.0",
+      "evt": "0.1.0",
+      "name-storage": "1.2.0"
     }
-  },
-  "zpm": {
-    "seer.js": ["seer-sai.js", "seer-jsniffer.js"]
   },
   "license": "MIT"
 }

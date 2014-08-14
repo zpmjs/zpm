@@ -8,13 +8,16 @@ commander
   .usage('<operation> [options]')
   .option('-v, --version', 'output the version number')
   .option('build', 'build module.')
+  .option('--all-in-one', 'build with dependencies in one module.')
   .option('zip', 'build and zip module.')
   .parse(process.argv);
 
 var cwd = process.cwd();
 
 if (commander.build){
-  zpm.build(cwd);
+
+  zpm.build(cwd, commander.allInOne || false);
+
 } else if (commander.zip){
   zpm.zip(cwd);
 } else {

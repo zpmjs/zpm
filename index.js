@@ -1,14 +1,18 @@
 
 var path = require("path");
 var gulp = require("gulp");
+var eventStream = require("event-stream");
 var concat = require("gulp-concat");
 var uglify = require("gulp-uglify");
 var beautify = require("gulp-jsbeautify");
 var replace = require("gulp-replace");
+var wrap = require("gulp-wrap");
 var zip = require("gulp-zip");
 var del = require("del");
 
-exports.build = function(cwd){
+// @param {String} cwd, current working diractory.
+// @param {Boolean} allInOne.
+exports.build = function(cwd, allInOne){
   var pkg = require(cwd + "/package.json");
 
   if (!pkg || !pkg.spm){return;}
@@ -24,9 +28,35 @@ exports.build = function(cwd){
   del(dist_dir, function(){
     var intro_file = __dirname + "/template/intro.js";
     var outro_file = __dirname + "/template/outro.js";
+    var zpmjs_file = __dirname + "/node_modules/zpmjs/zpm.js"
     var src_file = cwd + "/" + main_file;
 
+    var debug_streams = [];
+    var minify_streams = [];
+
+    function makeStream(file_path, module_id, is_debug){
+      var s_debug = is_debug ? "-debug" : "";
+
+      return gulp.src(file_path)
+        .pipe(wrap(
+          'zpmjs.define("{MODULE_ID}", function(require, exports, module){\n' +
+          '<%= contents %>\n});'))
+        .pipe(replace('"{MODULE_ID}"', '"' + module_id + s_debug + '"'))
+        .pipe(replace(/\brequire\s*\(\s*(["'])([^\1]*?)\1\s*\)/g, function($0, $1_quote, $2_name){
+          return deps[$2_name] ? 'require(' + $1_quote + dep_mods[$2_name] + s_debug + $1_quote + ')'  : $0;
+        }));
+    }
+    debug_streams.push(
+      gulp.src(zpmjs_file)
+        .pipe(beautify({indent_size: 2}))
+    );
+    minify_streams.push(
+      gulp.src(zpmjs_file)
+        .pipe(uglify())
+    );
+
     var deps = {};
+
     if (pkg.zpm && pkg.zpm.dependencies){
       deps = pkg.zpm.dependencies;
     } else if (pkg.spm && pkg.spm.dependencies){
@@ -34,6 +64,7 @@ exports.build = function(cwd){
     }
 
     var dep_mods = {};
+
     for(var mod in deps){
       var dep_pkg = require(path.join(cwd, "sea-modules", mod, deps[mod], "package.json"));
       dep_mods[mod] = path.join(mod, deps[mod],
@@ -41,26 +72,46 @@ exports.build = function(cwd){
       );
     }
 
-    // build
-    gulp.src([intro_file, src_file, outro_file])
-      .pipe(concat(main_file))
-      .pipe(replace('"{MODULE_ID}"', '"' + [name, version, main].join("/") + '"'))
-      .pipe(replace('"{MODULE_DEPS}"', '[]'))
-      .pipe(replace(/\brequire\s*\(\s*(["'])([^\1]*)\1\s*\)/, function($0, $1_quote, $2_name){
-        return deps[$2_name] ? 'require(' + $1_quote + dep_mods[$2_name] + $1_quote + ')'  : $0;
-      }))
-      .pipe(uglify())
+    if (allInOne) {
+      for(var mod in deps){
+        debug_streams.push(
+          makeStream(path.join(cwd, "sea-modules", dep_mods[mod]+".js"),
+              dep_mods[mod],
+              true
+            )
+            .pipe(beautify({indent_size: 2}))
+        );
+        minify_streams.push(
+          makeStream(path.join(cwd, "sea-modules", dep_mods[mod]+".js"),
+              dep_mods[mod],
+              false
+            )
+            .pipe(uglify())
+        );
+      }
+    }
+
+    debug_streams.push(
+      makeStream(src_file,
+          [name, version, main].join("/"),
+          true
+        )
+        .pipe(beautify({indent_size: 2}))
+    );
+    minify_streams.push(
+      makeStream(src_file,
+          [name, version, main].join("/"),
+          false
+        )
+        .pipe(uglify())
+    );
+
+    eventStream.merge.apply(eventStream, debug_streams)
+      .pipe(concat(debug_file))
       .pipe(gulp.dest([dist_dir, name, version].join("/")));
 
-    // build-debug
-    gulp.src([intro_file, src_file, outro_file])
-      .pipe(concat(debug_file))
-      .pipe(replace('"{MODULE_ID}"', '"' + [name, version, main+"-debug"].join("/") + '"'))
-      .pipe(replace('"{MODULE_DEPS}"', '[]'))
-      .pipe(replace(/\brequire\s*\(\s*(["'])([^\1]*)\1\s*\)/, function($0, $1_quote, $2_name){
-        return deps[$2_name] ? 'require(' + $1_quote + dep_mods[$2_name] + $1_quote + ')'  : $0;
-      }))
-      .pipe(beautify({indent_size: 2}))
+    eventStream.merge.apply(eventStream, minify_streams)
+      .pipe(concat(main_file))
       .pipe(gulp.dest([dist_dir, name, version].join("/")));
 
   });
