@@ -28,7 +28,7 @@
     "gulp-uglify": "0.3.1",
     "gulp-wrap": "^0.3.0",
     "gulp-zip": "0.4.0",
-    "zpmjs": "0.1.0"
+    "zpmjs": "^0.2.0"
   },
   "devDependencies": {
     "expect.js": "^0.3.1",
