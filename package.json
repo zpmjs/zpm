@@ -18,24 +18,32 @@
     "test": "make test"
   },
   "dependencies": {
-    "zpmjs": "0.1.0",
-    "gulp": "3.8.6",
-    "gulp-uglify": "0.3.1",
-    "gulp-jsbeautify": "0.1.1",
-    "gulp-concat": "2.3.3",
-    "gulp-replace": "0.4.0",
-    "gulp-zip": "0.4.0",
+    "commander": "1.1.1",
     "del": "0.1.1",
-    "commander": "1.1.1"
+    "event-stream": "^3.1.7",
+    "gulp": "3.8.6",
+    "gulp-concat": "2.3.3",
+    "gulp-jsbeautify": "0.1.1",
+    "gulp-replace": "0.4.0",
+    "gulp-uglify": "0.3.1",
+    "gulp-wrap": "^0.3.0",
+    "gulp-zip": "0.4.0",
+    "zpmjs": "0.1.0"
   },
   "spm": {
     "main": "test/index.js",
     "dependencies": {
-      "detector": "2.0.1"
+      "detector": "2.0.1",
+      "ready": "0.0.0",
+      "evt": "0.1.0",
+      "name-storage": "1.2.0"
     }
   },
   "zpm": {
-    "seer.js": ["seer-sai.js", "seer-jsniffer.js"]
+    "seer.js": [
+      "seer-sai.js",
+      "seer-jsniffer.js"
+    ]
   },
   "license": "MIT"
 }
