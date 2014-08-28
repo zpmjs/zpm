@@ -40,7 +40,8 @@
       "detector": "2.0.1",
       "ready": "0.0.0",
       "evt": "0.1.0",
-      "name-storage": "1.2.0"
+      "name-storage": "1.2.0",
+      "tracker": "2.0.2"
     }
   },
   "license": "MIT"
