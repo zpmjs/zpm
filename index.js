@@ -115,13 +115,21 @@ exports.build = function(cwd, allInOne){
 
 
     if (allInOne) {
+
+      var ONE = {};
+
       for(var mod in dep_mods){
         var dep_id = dep_mods[mod];
         var dep_file = dep_id + ".js";
+
+        if (ONE[dep_file] === dep_file){ continue;}
+        ONE[dep_file] = dep_file;
+
         debug_streams.push(
           makeStream(path.join(cwd, DEFAULT_SPM_MODULE_DIR, dep_file), dep_id, true)
             .pipe(beautify({indent_size: 2}))
         );
+
         minify_streams.push(
           makeStream(path.join(cwd, DEFAULT_SPM_MODULE_DIR, dep_file), dep_id, false)
             .pipe(uglify())
