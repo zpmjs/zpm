@@ -9,11 +9,24 @@ var replace = require("gulp-replace");
 var wrap = require("gulp-wrap");
 var zip = require("gulp-zip");
 var del = require("del");
+var fs = require("fs");
+
+var DEFAULT_SPM_MODULE_DIR = "spm_modules";
+if (!fs.existsSync(DEFAULT_SPM_MODULE_DIR)){
+  DEFAULT_SPM_MODULE_DIR = "sea-modules";
+}
 
 // @param {String} cwd, current working diractory.
 // @param {Boolean} allInOne.
 exports.build = function(cwd, allInOne){
-  var pkg = require(cwd + "/package.json");
+  var pkg_file = cwd + "/package.json";
+
+  if (!fs.existsSync(pkg_file)) {
+    console.error("File not found: " + pkg_file);
+    return;
+  }
+
+  var pkg = require(pkg_file);
 
   if (!pkg || !pkg.spm){return;}
 
@@ -43,7 +56,8 @@ exports.build = function(cwd, allInOne){
           '<%= contents %>\n});'))
         .pipe(replace('"{MODULE_ID}"', '"' + module_id + s_debug + '"'))
         .pipe(replace(/\brequire\s*\(\s*(["'])([^\1]*?)\1\s*\)/g, function($0, $1_quote, $2_name){
-          return deps[$2_name] ? 'require(' + $1_quote + dep_mods[$2_name] + s_debug + $1_quote + ')'  : $0;
+          var dep_full_name = dep_mods[module_id + ":" + $2_name];
+          return dep_full_name ? 'require(' + $1_quote + dep_full_name + s_debug + $1_quote + ')'  : $0;
         }));
     }
     debug_streams.push(
@@ -55,37 +69,61 @@ exports.build = function(cwd, allInOne){
         .pipe(uglify())
     );
 
-    var deps = {};
+    function cacheDeps(cache, pkg){
+      var pkg_name = pkg.name;
+      var pkg_version = pkg.version;
+      var pkg_main = (pkg.spm && pkg.spm.main ? pkg.spm.main : pkg.main)
+        .replace(/\.js$/, "");
 
-    if (pkg.zpm && pkg.zpm.dependencies){
-      deps = pkg.zpm.dependencies;
-    } else if (pkg.spm && pkg.spm.dependencies){
-      deps = pkg.spm.dependencies;
+      var dependencies;
+
+      if (pkg.zpm && pkg.zpm.dependencies){
+        dependencies = pkg.zpm.dependencies;
+      } else if (pkg.spm && pkg.spm.dependencies){
+        dependencies = pkg.spm.dependencies;
+      }
+
+      for(var dep_name in dependencies){
+        if (!dependencies.hasOwnProperty(dep_name)) {continue;}
+
+        var dep_version = dependencies[dep_name];
+
+        var dep_pkg_file = path.join(cwd, DEFAULT_SPM_MODULE_DIR, dep_name, dep_version, "package.json");
+        if (!fs.existsSync(dep_pkg_file)) {
+          console.error("File not found: " + dep_pkg_file);
+          continue;
+        }
+        var dep_pkg = require(dep_pkg_file);
+        var dep_main = (dep_pkg.spm && dep_pkg.spm.main ? dep_pkg.spm.main : dep_pkg.main).replace(/\.js$/, "");
+
+        cache[pkg_name + "/" + pkg_version + "/" + pkg_main + ":" + dep_name] = path.join(
+          dep_name,
+          dep_version,
+          dep_main
+        );
+
+        cacheDeps(cache, dep_pkg);
+      }
+
     }
 
+
+    // 缓存依赖关系。
+    // dep_mods[module_name] = "module_name/module_version/module_main"
     var dep_mods = {};
+    cacheDeps(dep_mods, pkg);
 
-    for(var mod in deps){
-      var dep_pkg = require(path.join(cwd, "sea-modules", mod, deps[mod], "package.json"));
-      dep_mods[mod] = path.join(mod, deps[mod],
-        (dep_pkg.spm ? dep_pkg.spm.main : dep_pkg.main).replace(/\.js$/, "")
-      );
-    }
 
     if (allInOne) {
-      for(var mod in deps){
+      for(var mod in dep_mods){
+        var dep_id = dep_mods[mod];
+        var dep_file = dep_id + ".js";
         debug_streams.push(
-          makeStream(path.join(cwd, "sea-modules", dep_mods[mod]+".js"),
-              dep_mods[mod],
-              true
-            )
+          makeStream(path.join(cwd, DEFAULT_SPM_MODULE_DIR, dep_file), dep_id, true)
             .pipe(beautify({indent_size: 2}))
         );
         minify_streams.push(
-          makeStream(path.join(cwd, "sea-modules", dep_mods[mod]+".js"),
-              dep_mods[mod],
-              false
-            )
+          makeStream(path.join(cwd, DEFAULT_SPM_MODULE_DIR, dep_file), dep_id, false)
             .pipe(uglify())
         );
       }
