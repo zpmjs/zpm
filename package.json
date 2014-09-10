@@ -1,6 +1,6 @@
 {
   "name": "zpm",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "The end of umd package manager for web.",
   "main": "index.js",
   "bin": {
@@ -28,7 +28,7 @@
     "gulp-uglify": "0.3.1",
     "gulp-wrap": "^0.3.0",
     "gulp-zip": "0.4.0",
-    "zpmjs": "^0.2.0"
+    "zpmjs": "^0.2.1"
   },
   "devDependencies": {
     "expect.js": "^0.3.1",
